@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d1514134bc4fbd41bb739b1b9a49231, type: 3}
+  m_Name: BoardCell
+  m_EditorClassIdentifier: 
+  m_DefaultSprite: {fileID: -3652224210275702585, guid: cc044bdcfded2cc4b9fd17da84ca885c, type: 3}
+  m_DefaultGameObject: {fileID: 5076026645050875031, guid: 08a84cfa7199902429d23f3241f94e17, type: 3}
+  m_DefaultColliderType: 1
+  m_TilingRules: []
