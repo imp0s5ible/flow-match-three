@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Heart
   m_EditorClassIdentifier: 
   blockName: Heart
-  displaySprite: {fileID: -3594744993593670419, guid: c73f354dd3064574a906c4aea639a2cd, type: 3}
+  displaySprite: {fileID: 542385044, guid: f182b3a06c8a80b429094d4042cdc491, type: 3}

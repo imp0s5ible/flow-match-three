@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Star
   m_EditorClassIdentifier: 
   blockName: Star
-  displaySprite: {fileID: 8861623843947659057, guid: c73f354dd3064574a906c4aea639a2cd, type: 3}
+  displaySprite: {fileID: -957478465, guid: f182b3a06c8a80b429094d4042cdc491, type: 3}
