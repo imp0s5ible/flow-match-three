@@ -323,7 +323,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1174572367}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.01, z: 0}
+  m_LocalPosition: {x: 0, y: 0.01, z: 1.02}
   m_LocalScale: {x: 0.31117707, y: 0.31117707, z: 0.31117707}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -341,6 +341,7 @@ GameObject:
   - component: {fileID: 1575374617}
   - component: {fileID: 1575374619}
   - component: {fileID: 1575374618}
+  - component: {fileID: 1575374620}
   m_Layer: 0
   m_Name: GameMap
   m_TagString: Untagged
@@ -2586,6 +2587,30 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!114 &1575374620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1575374616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a68036f91174f894481949ce128c82a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floorTile: {fileID: 11400000, guid: 5b8b03b5f1d77f2478d46b33ecf3c4ad, type: 2}
+  wallTile: {fileID: 11400000, guid: 08002d404144b40bf842342dda8fa3e4, type: 2}
+  pieceContainer: {fileID: 2064950128}
+  totalBlockSpawnTimeInSeconds: 1
+  delayAfterAllBlockSpawned: 1
+  possibleBlockTypes:
+  - {fileID: 11400000, guid: df972f0c0c2a2144fad6812a8032def6, type: 2}
+  - {fileID: 11400000, guid: d0691cefa620c4b43b0144cdfadcf54a, type: 2}
+  - {fileID: 11400000, guid: 2187536dd52ac944091b2ff82d77b274, type: 2}
+  - {fileID: 11400000, guid: e646112ca32025c41a0ad94134b2ba52, type: 2}
+  - {fileID: 11400000, guid: 03232593436d52a45815c2b9d95726a1, type: 2}
+  - {fileID: 11400000, guid: 420f59cf7cda2664e80c4d1914a7b6c6, type: 2}
 --- !u!1 &1745286729
 GameObject:
   m_ObjectHideFlags: 0
@@ -2628,6 +2653,38 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1575374617}
+  - {fileID: 2064950129}
   m_Father: {fileID: 0}
   m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2064950128
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2064950129}
+  m_Layer: 0
+  m_Name: Blocks
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2064950129
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2064950128}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1745286731}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

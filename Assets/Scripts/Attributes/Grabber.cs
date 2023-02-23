@@ -4,8 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[System.Serializable]
-public abstract class IGrabbableRepository : MonoBehaviour
+public interface IGrabbableRepository
 {
     public abstract Grabbable GetGrabbableAtPosition(Vector3 grabPos);
     public abstract void GrabberReleasedAtPosition(Grabbable pos, Vector3 releasePos);
