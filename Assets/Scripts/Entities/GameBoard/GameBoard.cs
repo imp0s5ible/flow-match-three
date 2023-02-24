@@ -36,6 +36,15 @@ public partial class GameBoard : MonoBehaviour
         Debug.Assert(floorTile != null);
         Debug.Assert(wallTile != null);
         await FillMapWithPieces();
+        RecachePossibleSwitches();
+    }
+
+    void Update()
+    {
+        foreach ((Vector2Int from, Vector2Int to) in possibleSwitches.Keys)
+        {
+            Debug.DrawLine(cachedTilemap.GetCellCenterWorld((Vector3Int)from), cachedTilemap.GetCellCenterWorld((Vector3Int)to), Color.green);
+        }
     }
 
     private Block GetBlockAt(Vector2Int gridPosition)
