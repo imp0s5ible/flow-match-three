@@ -14,13 +14,17 @@ public partial class GameBoard
         return GetBlockPositionsDestroyedByBlockTypes(blockTypeOverrides, gridPosition).Any();
     }
 
-    IEnumerable<Vector2Int> GetUniqueBlockPositionsDestroyedByBlockTypes(Dictionary<Vector2Int, BlockType> blockTypeOverrides, Vector2Int gridPosition)
-    {
-        return GetBlockPositionsDestroyedByBlockTypes(blockTypeOverrides, gridPosition).Distinct();
-    }
-
     IEnumerable<Vector2Int> GetBlockPositionsDestroyedByBlockTypes(Dictionary<Vector2Int, BlockType> blockTypeOverrides, Vector2Int gridPosition)
     {
+
+        IEnumerable<Vector2Int> horizontalDestructionRange = DirectionalDestructionRange(Vector2Int.right);
+        horizontalDestructionRange = matchingBlocksNeeded <= horizontalDestructionRange.Count() ? horizontalDestructionRange : Enumerable.Empty<Vector2Int>();
+
+        IEnumerable<Vector2Int> verticalDestructionRange = DirectionalDestructionRange(Vector2Int.up);
+        verticalDestructionRange = matchingBlocksNeeded <= verticalDestructionRange.Count() ? verticalDestructionRange : Enumerable.Empty<Vector2Int>();
+
+        return horizontalDestructionRange.Concat(verticalDestructionRange).Distinct();
+
         BlockType GetBlockTypeWithOverrides(Vector2Int t)
         {
             if (blockTypeOverrides.ContainsKey(t))
@@ -33,56 +37,20 @@ public partial class GameBoard
             }
         }
 
-        foreach (IEnumerable<Vector2Int> range in DestructibleRanges(gridPosition))
+        IEnumerable<Vector2Int> DirectionalDestructionRange(Vector2Int direction)
         {
-
-            if (range.All(t => GetBlockTypeWithOverrides(t) == GetBlockTypeWithOverrides(gridPosition)))
+            yield return gridPosition;
+            for (Vector2Int t = gridPosition + direction; IsPositionFloor(t) && GetBlockTypeWithOverrides(t) == GetBlockTypeWithOverrides(gridPosition); t += direction)
             {
-                foreach (Vector2Int pos in range)
-                {
-                    yield return pos;
-                }
+                yield return t;
+            }
+            for (Vector2Int t = gridPosition - direction; IsPositionFloor(t) && GetBlockTypeWithOverrides(t) == GetBlockTypeWithOverrides(gridPosition); t -= direction)
+            {
+                yield return t;
             }
         }
     }
 
-
-    IEnumerable<IEnumerable<Vector2Int>> DestructibleRanges(Vector2Int origin)
-    {
-        for (int beginX = origin.x - matchingBlocksNeeded + 1; beginX <= origin.x; ++beginX)
-        {
-            IEnumerable<Vector2Int> candidateRange = HorizontalRange(new Vector2Int(beginX, origin.y));
-            if (candidateRange.All(v => IsPositionFloor(v)))
-            {
-                yield return candidateRange;
-            }
-        }
-
-        for (int beginY = origin.y - matchingBlocksNeeded + 1; beginY <= origin.y; ++beginY)
-        {
-            IEnumerable<Vector2Int> candidateRange = VerticalRange(new Vector2Int(origin.x, beginY));
-            if (candidateRange.All(v => IsPositionFloor(v)))
-            {
-                yield return candidateRange;
-            }
-        }
-    }
-
-    IEnumerable<Vector2Int> HorizontalRange(Vector2Int leftBegin)
-    {
-        for (int x = leftBegin.x; x < leftBegin.x + matchingBlocksNeeded; ++x)
-        {
-            yield return new Vector2Int(x, leftBegin.y);
-        }
-    }
-
-    IEnumerable<Vector2Int> VerticalRange(Vector2Int bottomBegin)
-    {
-        for (int y = bottomBegin.y; y < bottomBegin.y + matchingBlocksNeeded; ++y)
-        {
-            yield return new Vector2Int(bottomBegin.x, y);
-        }
-    }
 
     Block SpawnRandomBlockAt(Vector2Int gridPosition, bool canCauseDestruction = false)
     {

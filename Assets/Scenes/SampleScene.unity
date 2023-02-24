@@ -2602,8 +2602,7 @@ MonoBehaviour:
   floorTile: {fileID: 11400000, guid: 5b8b03b5f1d77f2478d46b33ecf3c4ad, type: 2}
   wallTile: {fileID: 11400000, guid: 08002d404144b40bf842342dda8fa3e4, type: 2}
   pieceContainer: {fileID: 2064950128}
-  totalBlockSpawnTimeInSeconds: 1
-  delayAfterAllBlockSpawned: 1
+  totalBlockSpawnTimeInSeconds: 3
   possibleBlockTypes:
   - {fileID: 11400000, guid: df972f0c0c2a2144fad6812a8032def6, type: 2}
   - {fileID: 11400000, guid: d0691cefa620c4b43b0144cdfadcf54a, type: 2}
@@ -2611,6 +2610,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e646112ca32025c41a0ad94134b2ba52, type: 2}
   - {fileID: 11400000, guid: 03232593436d52a45815c2b9d95726a1, type: 2}
   - {fileID: 11400000, guid: 420f59cf7cda2664e80c4d1914a7b6c6, type: 2}
+  delayAfterAllBlockSpawned: 1
+  matchingBlocksNeeded: 3
 --- !u!1 &1745286729
 GameObject:
   m_ObjectHideFlags: 0
