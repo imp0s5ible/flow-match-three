@@ -99,6 +99,11 @@ public partial class GameBoard
         return GetBlockPositionsDestroyedBySpawn(spawnedBlockType, gridPosition).Any();
     }
 
+    IEnumerable<Vector2Int> GetAllBlockPositionsToDestroy()
+    {
+        return IterateCellPositionsRegular().Select(p => GetBlockPositionsDestroyedByBlockTypes(new Dictionary<Vector2Int, BlockType>(), p)).Aggregate((a, b) => a.Concat(b)).Distinct();
+    }
+
     IEnumerable<Vector2Int> GetBlockPositionsDestroyedBySpawn(BlockType spawnedBlockType, Vector2Int gridPosition)
     {
         Dictionary<Vector2Int, BlockType> blockTypeOverrides = new Dictionary<Vector2Int, BlockType> { { gridPosition, spawnedBlockType } };

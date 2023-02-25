@@ -8,6 +8,8 @@ public partial class GameBoard
 {
     [SerializeField]
     public float blockSwitchTime = 0.5f;
+    [SerializeField]
+    public float delayAfterBlocksFall = 0.1f;
 
     public bool Grabbing
     {
@@ -119,19 +121,26 @@ public partial class GameBoard
         {
             await UniTask.WhenAll(MoveObject.Linear(blockFrom.gameObject, GetCellCenterWorld(to), blockSwitchTime), MoveObject.Linear(blockTo.gameObject, GetCellCenterWorld(from), blockSwitchTime));
 
-            List<Vector2Int> destroyPositions = GetBlockPositionsDestroyedBySwitch(from, to).ToList();
-            if (destroyPositions.Any())
+            List<Vector2Int> destroyPositionsList = GetBlockPositionsDestroyedBySwitch(from, to).ToList();
+            if (destroyPositionsList.Any())
             {
                 blocksOnBoard[from] = blockTo;
                 blocksOnBoard[to] = blockFrom;
-                await UniTask.WhenAll(destroyPositions.Select(p => DestroyBlockAt(p)));
-                await UniTask.Delay(System.TimeSpan.FromSeconds(delayAfterBlocksDestroyed));
 
-                await UniTask.WhenAll(destroyPositions.Select(p => p.x).Distinct().Select(x =>
+                while (destroyPositionsList.Any())
                 {
-                    SpawnReplacementBlocksForColumn(x);
-                    return FallBlocksInColumn(x);
-                }).Aggregate((i, j) => i.Concat(j)));
+                    await UniTask.WhenAll(destroyPositionsList.Select(p => DestroyBlockAt(p)));
+                    await UniTask.Delay(System.TimeSpan.FromSeconds(delayAfterBlocksDestroyed));
+
+                    await UniTask.WhenAll(destroyPositionsList.Select(p => p.x).Distinct().Select(x =>
+                    {
+                        SpawnReplacementBlocksForColumn(x);
+                        return FallBlocksInColumn(x);
+                    }).Aggregate((i, j) => i.Concat(j)));
+                    await UniTask.Delay(System.TimeSpan.FromSeconds(delayAfterBlocksFall));
+                    destroyPositionsList = GetAllBlockPositionsToDestroy().ToList();
+                }
+                RecachePossibleSwitches();
             }
             else
             {

@@ -3328,7 +3328,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 03232593436d52a45815c2b9d95726a1, type: 2}
   - {fileID: 11400000, guid: 420f59cf7cda2664e80c4d1914a7b6c6, type: 2}
   delayAfterAllBlockSpawned: 1
-  delayAfterBlocksDestroyed: 1
+  delayAfterBlocksDestroyed: 0.25
   blockFallCurve:
     serializedVersion: 2
     m_Curve:
@@ -3365,6 +3365,7 @@ MonoBehaviour:
   blockFallTime: 0.3
   fallThroughWalls: 1
   blockSwitchTime: 0.1
+  delayAfterBlocksFall: 0.1
   matchingBlocksNeeded: 3
 --- !u!1 &1745286729
 GameObject:
