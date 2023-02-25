@@ -68,7 +68,6 @@ public partial class GameBoard
 
         Vector3 worldPosition =
             GetCellCenterWorld(gridPosition);
-        worldPosition.z = blockContainer.transform.position.z;
         Block newBlock =
             Block
                 .InstantiateWithBlockType(worldPosition,

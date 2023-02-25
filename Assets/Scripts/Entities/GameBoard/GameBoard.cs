@@ -54,7 +54,7 @@ public partial class GameBoard : MonoBehaviour
 
     private Vector3 GetCellCenterWorld(Vector2Int gridPosition)
     {
-        return cachedTilemap.GetCellCenterWorld((Vector3Int)gridPosition);
+        return blockContainer.transform.position + cachedTilemap.GetCellCenterWorld((Vector3Int)gridPosition);
     }
 
     private Vector3 GetCellCenterLocal(Vector2Int gridPosition)

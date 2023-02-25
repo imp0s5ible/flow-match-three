@@ -122,6 +122,8 @@ public partial class GameBoard
             IEnumerable<Vector2Int> destroyPositions = GetBlockPositionsDestroyedBySwitch(from, to);
             if (destroyPositions.Any())
             {
+                blocksOnBoard[from] = blockTo;
+                blocksOnBoard[to] = blockFrom;
                 await UniTask.WhenAll(destroyPositions.Select(p => DestroyBlockAt(p)));
                 await UniTask.Delay(System.TimeSpan.FromSeconds(delayAfterBlocksDestroyed));
             }
@@ -135,7 +137,7 @@ public partial class GameBoard
     private async UniTask DestroyBlockAt(Vector2Int at)
     {
         GameObject.Destroy(GetBlockAt(at).gameObject);
-        blocksOnBoard[at] = null;
+        blocksOnBoard.Remove(at);
         await UniTask.Yield();
     }
 }
