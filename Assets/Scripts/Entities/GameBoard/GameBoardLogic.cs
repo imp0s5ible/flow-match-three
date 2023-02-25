@@ -4,7 +4,7 @@ using UnityEngine;
 
 public partial class GameBoard
 {
-    private Dictionary<Vector2Int, Block> piecesOnBoard = new Dictionary<Vector2Int, Block>();
+    private Dictionary<Vector2Int, Block> blocksOnBoard = new Dictionary<Vector2Int, Block>();
     private Dictionary<(Vector2Int, Vector2Int), IEnumerable<Vector2Int>> possibleSwitches = new Dictionary<(Vector2Int, Vector2Int), IEnumerable<Vector2Int>>();
 
     [SerializeField]
@@ -60,7 +60,7 @@ public partial class GameBoard
 
     Block SpawnBlockAt(Vector2Int gridPosition, BlockType blockType)
     {
-        if (piecesOnBoard.ContainsKey(gridPosition))
+        if (blocksOnBoard.ContainsKey(gridPosition))
         {
             Debug.LogError("Tried to spawn a block at a grid point that already has a block!");
             return null;
@@ -68,13 +68,14 @@ public partial class GameBoard
 
         Vector3 worldPosition =
             GetCellCenterWorld(gridPosition);
+        worldPosition.z = blockContainer.transform.position.z;
         Block newBlock =
             Block
                 .InstantiateWithBlockType(worldPosition,
                 blockType,
-                pieceContainer ?? gameObject);
+                blockContainer ?? gameObject);
 
-        piecesOnBoard[gridPosition] = newBlock;
+        blocksOnBoard[gridPosition] = newBlock;
         return newBlock;
     }
 

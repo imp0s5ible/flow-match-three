@@ -13,7 +13,7 @@ public partial class GameBoard : MonoBehaviour
     private RuleTile wallTile = null;
 
     [SerializeField]
-    private GameObject pieceContainer = null;
+    private GameObject blockContainer = null;
 
     [SerializeField]
     private float totalBlockSpawnTimeInSeconds = 1.0f;
@@ -30,7 +30,7 @@ public partial class GameBoard : MonoBehaviour
         Debug.Assert(possibleBlockTypes.Count != 0);
         Debug.Assert(floorTile != null);
         Debug.Assert(wallTile != null);
-        await FillMapWithPieces();
+        await FillMapWithBlocks();
         RecachePossibleSwitches();
     }
 
@@ -44,7 +44,7 @@ public partial class GameBoard : MonoBehaviour
 
     private Block GetBlockAt(Vector2Int gridPosition)
     {
-        return piecesOnBoard.GetValueOrDefault(gridPosition, null);
+        return blocksOnBoard.GetValueOrDefault(gridPosition, null);
     }
 
     private BlockType GetBlockTypeAt(Vector2Int gridPosition)

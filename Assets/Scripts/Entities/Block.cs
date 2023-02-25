@@ -45,6 +45,7 @@ public class Block : MonoBehaviour
         }
 
         SpriteRenderer resultSpriteRenderer = result.AddComponent<SpriteRenderer>();
+        resultSpriteRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
         Block resultBlock = result.AddComponent<Block>();
         resultBlock.cachedSpriteRenderer = resultSpriteRenderer;
         resultBlock.BlockType = blockType;

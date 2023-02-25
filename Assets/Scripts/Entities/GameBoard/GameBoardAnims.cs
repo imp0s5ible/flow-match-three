@@ -54,7 +54,7 @@ public partial class GameBoard
         }
     }
 
-    async UniTask FillMapWithPieces()
+    async UniTask FillMapWithBlocks()
     {
         using (new InteractionLock(this))
         {

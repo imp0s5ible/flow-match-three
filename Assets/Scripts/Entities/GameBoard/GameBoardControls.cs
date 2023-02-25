@@ -108,14 +108,13 @@ public partial class GameBoard
             return;
         }
 
-        if (!piecesOnBoard.ContainsKey(to) || !piecesOnBoard.ContainsKey(from))
+        Block blockFrom = GetBlockAt(from);
+        Block blockTo = GetBlockAt(to);
+        if (blockFrom == null || blockTo == null)
         {
-            Debug.LogWarning("Attempted to drag from " + from.ToString() + " to " + to.ToString() + " but not both of these have a piece!");
+            Debug.LogWarning("Attempted to drag from " + from.ToString() + " to " + to.ToString() + " but not both of these have a block!");
             return;
         }
-
-        Block blockFrom = piecesOnBoard[from];
-        Block blockTo = piecesOnBoard[to];
         using (new InteractionLock(this))
         {
             await UniTask.WhenAll(MoveObject.Linear(blockFrom.gameObject, GetCellCenterWorld(to), blockSwitchTime), MoveObject.Linear(blockTo.gameObject, GetCellCenterWorld(from), blockSwitchTime));
@@ -123,8 +122,6 @@ public partial class GameBoard
             IEnumerable<Vector2Int> destroyPositions = GetBlockPositionsDestroyedBySwitch(from, to);
             if (destroyPositions.Any())
             {
-                piecesOnBoard[to] = blockFrom;
-                piecesOnBoard[from] = blockTo;
                 await UniTask.WhenAll(destroyPositions.Select(p => DestroyBlockAt(p)));
                 await UniTask.Delay(System.TimeSpan.FromSeconds(delayAfterBlocksDestroyed));
             }
@@ -137,8 +134,8 @@ public partial class GameBoard
 
     private async UniTask DestroyBlockAt(Vector2Int at)
     {
-        GameObject.Destroy(piecesOnBoard[at].gameObject);
-        piecesOnBoard[at] = null;
+        GameObject.Destroy(GetBlockAt(at).gameObject);
+        blocksOnBoard[at] = null;
         await UniTask.Yield();
     }
 }
