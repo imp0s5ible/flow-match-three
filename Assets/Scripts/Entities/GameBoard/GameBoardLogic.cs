@@ -67,7 +67,7 @@ public partial class GameBoard
         }
 
         Vector3 worldPosition =
-            cachedTilemap.GetCellCenterWorld((Vector3Int)gridPosition);
+            GetCellCenterWorld(gridPosition);
         Block newBlock =
             Block
                 .InstantiateWithBlockType(worldPosition,

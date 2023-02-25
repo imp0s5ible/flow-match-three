@@ -7,77 +7,78 @@ public partial class GameBoard
 {
     [SerializeField]
     private float delayAfterAllBlockSpawned = 1.0f;
+    private float delayAfterBlocksDestroyed = 1.0f;
+
+    private bool interactionLocked = false;
+
+    private readonly object interactionLock = new object();
+
+    private bool InteractionLocked
+    {
+        get
+        {
+            lock (interactionLock)
+            {
+                return interactionLocked;
+            }
+        }
+        set
+        {
+            lock (interactionLock)
+            {
+                interactionLocked = value;
+            }
+        }
+    }
+
+    private class InteractionLock : System.IDisposable
+    {
+        private GameBoard boardToLock;
+        public InteractionLock(GameBoard boardToLock)
+        {
+            this.boardToLock = boardToLock;
+            lock (boardToLock.interactionLock)
+            {
+                Debug.Assert(!boardToLock.interactionLocked);
+                boardToLock.interactionLocked = true;
+            }
+        }
+
+        void System.IDisposable.Dispose()
+        {
+            lock (boardToLock.interactionLock)
+            {
+                Debug.Assert(boardToLock.interactionLocked);
+                boardToLock.interactionLocked = false;
+            }
+        }
+    }
 
     async UniTask FillMapWithPieces()
     {
-        await DoWithInteractionLock(async () =>
-         {
-             IEnumerable<Vector2Int> floorPositions = IterateCellPositionsRegular().Where(v => IsPositionFloor(v));
-
-             int floorCount = floorPositions.Count();
-             if (floorCount <= 0)
-             {
-                 return;
-             }
-
-             System.TimeSpan singleDelay =
-                 System
-                     .TimeSpan
-                     .FromSeconds(totalBlockSpawnTimeInSeconds /
-                     (float)floorCount);
-
-             foreach (Vector2Int gridPosition in floorPositions)
-             {
-                 SpawnRandomBlockAt(gridPosition);
-                 await UniTask.Delay(singleDelay);
-             }
-
-             await UniTask.Delay(System.TimeSpan.FromSeconds(delayAfterAllBlockSpawned));
-         });
-    }
-
-    async UniTask DoWithInteractionLock(System.Func<UniTask> task)
-    {
-        if (!AcquireInteractionLockImmediate())
+        using (new InteractionLock(this))
         {
-            Debug.LogError("Failed to acquire interaction lock!");
-            return;
-        }
+            IEnumerable<Vector2Int> floorPositions = IterateCellPositionsRegular().Where(v => IsPositionFloor(v));
 
-        try
-        {
-            await task();
-        }
-        finally
-        {
-            ReleaseInteractionLockImmediate();
-        }
-    }
-
-    private bool AcquireInteractionLockImmediate()
-    {
-        lock (interactionLock)
-        {
-            if (!interactionLocked)
+            int floorCount = floorPositions.Count();
+            if (floorCount <= 0)
             {
-                interactionLocked = true;
-                return true;
+                return;
             }
-            else
-            {
-                return false;
-            }
-        }
-    }
 
-    private void ReleaseInteractionLockImmediate()
-    {
-        lock (interactionLock)
-        {
-            Debug
-                .Assert(interactionLocked,
-                "Tried to release interaction lock but it was already released!");
-            interactionLocked = false;
+            System.TimeSpan singleDelay =
+                System
+                    .TimeSpan
+                    .FromSeconds(totalBlockSpawnTimeInSeconds /
+                    (float)floorCount);
+
+            foreach (Vector2Int gridPosition in floorPositions)
+            {
+                SpawnRandomBlockAt(gridPosition);
+                await UniTask.Delay(singleDelay);
+            }
+
+            await UniTask.Delay(System.TimeSpan.FromSeconds(delayAfterAllBlockSpawned));
         }
     }
 

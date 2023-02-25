@@ -23,11 +23,6 @@ public partial class GameBoard : MonoBehaviour
     private Tilemap cachedTilemap = null;
 
 
-    private bool interactionLocked = false;
-
-    private readonly object interactionLock = new object();
-
-    public delegate void GameBoardOperation();
 
     async UniTask Start()
     {
@@ -43,7 +38,7 @@ public partial class GameBoard : MonoBehaviour
     {
         foreach ((Vector2Int from, Vector2Int to) in possibleSwitches.Keys)
         {
-            Debug.DrawLine(cachedTilemap.GetCellCenterWorld((Vector3Int)from), cachedTilemap.GetCellCenterWorld((Vector3Int)to), Color.green);
+            Debug.DrawLine(GetCellCenterWorld(from), GetCellCenterWorld(to), Color.green);
         }
     }
 
@@ -57,6 +52,25 @@ public partial class GameBoard : MonoBehaviour
         return GetBlockAt(gridPosition)?.BlockType;
     }
 
+    private Vector3 GetCellCenterWorld(Vector2Int gridPosition)
+    {
+        return cachedTilemap.GetCellCenterWorld((Vector3Int)gridPosition);
+    }
+
+    private Vector3 GetCellCenterLocal(Vector2Int gridPosition)
+    {
+        return cachedTilemap.GetCellCenterLocal((Vector3Int)gridPosition);
+    }
+
+    private Vector2Int WorldToCell(Vector3 worldPos)
+    {
+        return (Vector2Int)cachedTilemap.WorldToCell(worldPos);
+    }
+
+    private Vector2Int LocalToCell(Vector3 localPos)
+    {
+        return (Vector2Int)cachedTilemap.LocalToCell(localPos);
+    }
 
     private bool IsPositionFloor(Vector2Int gridPosition)
     {
