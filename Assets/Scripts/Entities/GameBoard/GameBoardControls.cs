@@ -119,13 +119,19 @@ public partial class GameBoard
         {
             await UniTask.WhenAll(MoveObject.Linear(blockFrom.gameObject, GetCellCenterWorld(to), blockSwitchTime), MoveObject.Linear(blockTo.gameObject, GetCellCenterWorld(from), blockSwitchTime));
 
-            IEnumerable<Vector2Int> destroyPositions = GetBlockPositionsDestroyedBySwitch(from, to);
+            List<Vector2Int> destroyPositions = GetBlockPositionsDestroyedBySwitch(from, to).ToList();
             if (destroyPositions.Any())
             {
                 blocksOnBoard[from] = blockTo;
                 blocksOnBoard[to] = blockFrom;
                 await UniTask.WhenAll(destroyPositions.Select(p => DestroyBlockAt(p)));
                 await UniTask.Delay(System.TimeSpan.FromSeconds(delayAfterBlocksDestroyed));
+
+                await UniTask.WhenAll(destroyPositions.Select(p => p.x).Distinct().Select(x =>
+                {
+                    SpawnReplacementBlocksForColumn(x);
+                    return FallBlocksInColumn(x);
+                }).Aggregate((i, j) => i.Concat(j)));
             }
             else
             {

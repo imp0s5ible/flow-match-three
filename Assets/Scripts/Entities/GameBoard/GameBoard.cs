@@ -72,6 +72,35 @@ public partial class GameBoard : MonoBehaviour
         return (Vector2Int)cachedTilemap.LocalToCell(localPos);
     }
 
+    private Vector2Int? GetLowestSpawnPositionForColumn(int x)
+    {
+        for (Vector2Int currentPosition = new Vector2Int(x, cachedTilemap.cellBounds.yMax);
+             cachedTilemap.cellBounds.yMin <= currentPosition.y;
+             currentPosition += Vector2Int.down)
+        {
+            if (IsPositionWall(currentPosition) && IsPositionFloor(currentPosition + Vector2Int.down))
+            {
+                return currentPosition;
+            }
+        }
+        return null;
+    }
+
+    private int CountEmptyCellsInColumn(int x)
+    {
+        int sum = 0;
+        for (Vector2Int currentPosition = new Vector2Int(x, cachedTilemap.cellBounds.yMin);
+             currentPosition.y <= cachedTilemap.cellBounds.yMax;
+             currentPosition += Vector2Int.up)
+        {
+            if (IsPositionFloor(currentPosition) && GetBlockAt(currentPosition) == null)
+            {
+                ++sum;
+            }
+        }
+        return sum;
+    }
+
     private bool IsPositionFloor(Vector2Int gridPosition)
     {
         return cachedTilemap.GetTile((Vector3Int)gridPosition) == floorTile;

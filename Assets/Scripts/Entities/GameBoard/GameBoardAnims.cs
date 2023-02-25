@@ -7,7 +7,14 @@ public partial class GameBoard
 {
     [SerializeField]
     private float delayAfterAllBlockSpawned = 1.0f;
+    [SerializeField]
     private float delayAfterBlocksDestroyed = 1.0f;
+    [SerializeField]
+    private AnimationCurve blockFallCurve = AnimationCurve.Linear(0.0f, 0.0f, 1.0f, 1.0f);
+    [SerializeField]
+    private float blockFallTime = 1.0f;
+    [SerializeField]
+    private int fallThroughWalls = 1;
 
     private bool interactionLocked = false;
 
@@ -80,6 +87,55 @@ public partial class GameBoard
 
             await UniTask.Delay(System.TimeSpan.FromSeconds(delayAfterAllBlockSpawned));
         }
+    }
+
+    private IEnumerable<UniTask> FallBlocksInColumn(int x)
+    {
+        List<(Block block, Vector2Int to)> fallInstructions = new List<(Block, Vector2Int)>();
+        for (int y = cachedTilemap.cellBounds.yMin; y <= cachedTilemap.cellBounds.yMax; ++y)
+        {
+            Vector2Int currentPosition = new Vector2Int(x, y);
+            Block fallingBlock = GetBlockAt(currentPosition);
+            if (fallingBlock != null)
+            {
+                Vector2Int fallPosition = GetFallPositionForBlockAt(currentPosition);
+
+                blocksOnBoard.Remove(currentPosition);
+                blocksOnBoard.Add(fallPosition, fallingBlock);
+
+                fallInstructions.Add((fallingBlock, fallPosition));
+            }
+        }
+
+        foreach (var fallInstruction in fallInstructions)
+        {
+            yield return MoveObject.WithCurve(fallInstruction.block.gameObject, GetCellCenterWorld(fallInstruction.to), blockFallCurve, blockFallTime);
+        }
+    }
+
+    private Vector2Int GetFallPositionForBlockAt(Vector2Int blockPosition)
+    {
+        Block fallingBlock = GetBlockAt(blockPosition);
+        Debug.Assert(fallingBlock != null);
+
+        Vector2Int fallToPosition = blockPosition;
+        Vector2Int lastFloorPosition = blockPosition;
+        int fallThroughWallCount = IsPositionFloor(blockPosition) ? fallThroughWalls : int.MaxValue;
+        while (GetBlockAt(fallToPosition + Vector2Int.down) == null && ((0 < fallThroughWallCount) || IsPositionFloor(fallToPosition + Vector2Int.down)))
+        {
+            fallToPosition += Vector2Int.down;
+            if (IsPositionFloor(fallToPosition))
+            {
+                lastFloorPosition = fallToPosition;
+                fallThroughWallCount = fallThroughWalls;
+            }
+            else
+            {
+                --fallThroughWallCount;
+            }
+        }
+
+        return lastFloorPosition;
     }
 
     private IEnumerable<Vector2Int> IterateCellPositionsRegular()

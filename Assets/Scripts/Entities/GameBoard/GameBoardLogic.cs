@@ -58,6 +58,17 @@ public partial class GameBoard
         return SpawnBlockAt(gridPosition, blockType);
     }
 
+    void SpawnReplacementBlocksForColumn(int x)
+    {
+        Vector2Int spawnPosition = GetLowestSpawnPositionForColumn(x).Value;
+        int blocksToSpawn = CountEmptyCellsInColumn(x);
+        for (int blocksSpawned = 0; blocksSpawned < blocksToSpawn; ++blocksSpawned)
+        {
+            SpawnRandomBlockAt(spawnPosition, true);
+            spawnPosition += Vector2Int.up;
+        }
+    }
+
     Block SpawnBlockAt(Vector2Int gridPosition, BlockType blockType)
     {
         if (blocksOnBoard.ContainsKey(gridPosition))

@@ -8,7 +8,7 @@ public static class MoveObject
         await WithCurve(objectToMove, to, AnimationCurve.Linear(0.0f, 0.0f, 1.0f, 1.0f), moveTimeInSeconds);
     }
 
-    static async UniTask WithCurve(GameObject objectToMove, Vector3 moveTo, AnimationCurve moveCurve, float moveTimeInSeconds)
+    public static async UniTask WithCurve(GameObject objectToMove, Vector3 moveTo, AnimationCurve moveCurve, float moveTimeInSeconds)
     {
         Vector3 originalPosition = objectToMove.transform.position;
         float progress = 0.0f;
