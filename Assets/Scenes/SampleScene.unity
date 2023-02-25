@@ -3362,9 +3362,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  blockFallTime: 0.5
+  blockFallTime: 0.3
   fallThroughWalls: 1
-  blockSwitchTime: 0.5
+  blockSwitchTime: 0.1
   matchingBlocksNeeded: 3
 --- !u!1 &1745286729
 GameObject:
