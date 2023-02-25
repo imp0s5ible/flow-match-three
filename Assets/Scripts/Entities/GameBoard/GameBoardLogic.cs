@@ -31,6 +31,7 @@ public partial class GameBoard
         }
     }
 
+
     Block SpawnRandomBlockAt(Vector2Int gridPosition, bool canCauseDestruction = false)
     {
         int randomIndex = Random.Range(0, possibleBlockTypes.Count - 1);
@@ -158,5 +159,30 @@ public partial class GameBoard
                 yield return t;
             }
         }
+    }
+
+    private Vector2Int GetFallPositionForBlockAt(Vector2Int blockPosition)
+    {
+        Block fallingBlock = GetBlockAt(blockPosition);
+        Debug.Assert(fallingBlock != null);
+
+        Vector2Int fallToPosition = blockPosition;
+        Vector2Int lastFloorPosition = blockPosition;
+        int fallThroughWallCount = IsPositionFloor(blockPosition) ? fallThroughWalls : int.MaxValue;
+        while (GetBlockAt(fallToPosition + Vector2Int.down) == null && ((0 < fallThroughWallCount) || IsPositionFloor(fallToPosition + Vector2Int.down)))
+        {
+            fallToPosition += Vector2Int.down;
+            if (IsPositionFloor(fallToPosition))
+            {
+                lastFloorPosition = fallToPosition;
+                fallThroughWallCount = fallThroughWalls;
+            }
+            else
+            {
+                --fallThroughWallCount;
+            }
+        }
+
+        return lastFloorPosition;
     }
 }

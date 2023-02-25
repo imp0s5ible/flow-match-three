@@ -112,48 +112,4 @@ public partial class GameBoard
             yield return MoveObject.WithCurve(fallInstruction.block.gameObject, GetCellCenterWorld(fallInstruction.to), blockFallCurve, blockFallTime);
         }
     }
-
-    private Vector2Int GetFallPositionForBlockAt(Vector2Int blockPosition)
-    {
-        Block fallingBlock = GetBlockAt(blockPosition);
-        Debug.Assert(fallingBlock != null);
-
-        Vector2Int fallToPosition = blockPosition;
-        Vector2Int lastFloorPosition = blockPosition;
-        int fallThroughWallCount = IsPositionFloor(blockPosition) ? fallThroughWalls : int.MaxValue;
-        while (GetBlockAt(fallToPosition + Vector2Int.down) == null && ((0 < fallThroughWallCount) || IsPositionFloor(fallToPosition + Vector2Int.down)))
-        {
-            fallToPosition += Vector2Int.down;
-            if (IsPositionFloor(fallToPosition))
-            {
-                lastFloorPosition = fallToPosition;
-                fallThroughWallCount = fallThroughWalls;
-            }
-            else
-            {
-                --fallThroughWallCount;
-            }
-        }
-
-        return lastFloorPosition;
-    }
-
-    private IEnumerable<Vector2Int> IterateCellPositionsRegular()
-    {
-        for (
-            int y = cachedTilemap.cellBounds.yMax - 1;
-            cachedTilemap.cellBounds.yMin <= y;
-            --y
-        )
-        {
-            for (
-                int x = cachedTilemap.cellBounds.xMin;
-                x < cachedTilemap.cellBounds.xMax;
-                ++x
-            )
-            {
-                yield return new Vector2Int(x, y);
-            }
-        }
-    }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -26,12 +27,14 @@ public partial class GameBoard : MonoBehaviour
 
     async UniTask Start()
     {
-        cachedTilemap = GetComponent<Tilemap>();
-        Debug.Assert(possibleBlockTypes.Count != 0);
-        Debug.Assert(floorTile != null);
-        Debug.Assert(wallTile != null);
-        await FillMapWithBlocks();
-        RecachePossibleSwitches();
+        using (new InteractionLock(this))
+        {
+            cachedTilemap = GetComponent<Tilemap>();
+            Debug.Assert(possibleBlockTypes.Count != 0);
+            Debug.Assert(floorTile != null);
+            Debug.Assert(wallTile != null);
+            await FillMapWithBlocks();
+        }
     }
 
     void Update()
@@ -46,7 +49,6 @@ public partial class GameBoard : MonoBehaviour
     {
         return blocksOnBoard.GetValueOrDefault(gridPosition, null);
     }
-
     private BlockType GetBlockTypeAt(Vector2Int gridPosition)
     {
         return GetBlockAt(gridPosition)?.BlockType;
@@ -70,6 +72,16 @@ public partial class GameBoard : MonoBehaviour
     private Vector2Int LocalToCell(Vector3 localPos)
     {
         return (Vector2Int)cachedTilemap.LocalToCell(localPos);
+    }
+
+    private IEnumerable<Block> EnumerateBlocks()
+    {
+        return EnumerateFloorPositions().Select(p => GetBlockAt(p)).Where(p => p != null);
+    }
+
+    private IEnumerable<Vector2Int> EnumerateFloorPositions()
+    {
+        return IterateCellPositionsRegular().Where(p => IsPositionFloor(p));
     }
 
     private Vector2Int? GetLowestSpawnPositionForColumn(int x)
@@ -111,5 +123,23 @@ public partial class GameBoard : MonoBehaviour
         return cachedTilemap.GetTile((Vector3Int)gridPosition) == wallTile;
     }
 
+    private IEnumerable<Vector2Int> IterateCellPositionsRegular()
+    {
+        for (
+            int y = cachedTilemap.cellBounds.yMax - 1;
+            cachedTilemap.cellBounds.yMin <= y;
+            --y
+        )
+        {
+            for (
+                int x = cachedTilemap.cellBounds.xMin;
+                x < cachedTilemap.cellBounds.xMax;
+                ++x
+            )
+            {
+                yield return new Vector2Int(x, y);
+            }
+        }
+    }
 
 }
