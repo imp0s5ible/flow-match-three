@@ -1,14 +1,24 @@
 {
-	"networks": {
-		"emulator": "127.0.0.1:3569",
-		"mainnet": "access.mainnet.nodes.onflow.org:9000",
-		"sandboxnet": "access.sandboxnet.nodes.onflow.org:9000",
-		"testnet": "access.devnet.nodes.onflow.org:9000"
-	},
-	"accounts": {
-		"emulator-account": {
-			"address": "f8d6e0586b0a20c7",
-			"key": "c5ecc3ee434095026f8da7d05dc784ba17174283dd79e48a305c1523a6a6c7c5"
-		}
-	}
+    "networks": {
+        "emulator": "127.0.0.1:3569",
+        "mainnet": "access.mainnet.nodes.onflow.org:9000",
+        "sandboxnet": "access.sandboxnet.nodes.onflow.org:9000",
+        "testnet": "access.devnet.nodes.onflow.org:9000"
+    },
+    "accounts": {
+        "emulator-account": {
+            "address": "f8d6e0586b0a20c7",
+            "key": "c5ecc3ee434095026f8da7d05dc784ba17174283dd79e48a305c1523a6a6c7c5"
+        }
+    },
+    "contracts": {
+        "NonFungibleToken": {
+            "source": ".Assets/Flow/cadence/dependencies/flow-nft/contracts/NonFungibleToken.cdc",
+            "aliases": {
+                "emulator": "0xf8d6e0586b0a20c7",
+                "testnet": "0x631e88ae7f1d7c20",
+                "mainnet": "0x1d7e57aa55817448"
+            }
+        }
+    }
 }

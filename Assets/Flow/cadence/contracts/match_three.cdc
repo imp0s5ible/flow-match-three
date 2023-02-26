@@ -1,1 +1,0 @@
- import NonFungibleToken from "github.com/onflow/flow-nft/blob/master/contracts/NonFungibleToken.cdc"
