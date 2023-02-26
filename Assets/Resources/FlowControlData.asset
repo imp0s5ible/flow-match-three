@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e257d130f47ae7b479953871aa021a19, type: 3}
+  m_Name: FlowControlData
+  m_EditorClassIdentifier: 
+  _emulatorSettings:
+    emulatorDataDirectory: S:/Users/Impossible/Unity/Projects/flow_match_three/FlowData
+    flowExecutablePathOverride: 
+    runEmulatorInPlayMode: 1
+    persistData: 1
+    killOtherFlow: 1
+    verbose: 1
+    emulatorEndpoint: http://127.0.0.1:8888/v1
+  _textReplacements: []
+  _accounts:
+  - _name: emulator_service_account
+    infoKeys:
+    - Private Key
+    - Address
+    infoValues:
+    - f26871e7f2c536b85b6490eeb8848435be53f6d366f96838ea6898f1154e706d
+    - 0xf8d6e0586b0a20c7
+    _gatewayName: Emulator
