@@ -30,3 +30,11 @@ MonoBehaviour:
     - f26871e7f2c536b85b6490eeb8848435be53f6d366f96838ea6898f1154e706d
     - 0xf8d6e0586b0a20c7
     _gatewayName: Emulator
+  - _name: user
+    infoKeys:
+    - Private Key
+    - Address
+    infoValues:
+    - df4106d4f54c87c79fb6508e319931a9fe8ae005e63a1d06115eea038be606d4
+    - 0x01cf0e2f2f715450
+    _gatewayName: Emulator
