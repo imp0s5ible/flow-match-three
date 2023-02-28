@@ -1,5 +1,7 @@
-import ExampleNFT from "../../contracts/ExampleNFT.cdc"
-import MetadataViews from "../../contracts/MetadataViews.cdc"
+import GachaAvatars from "../contracts/gacha-avatars.cdc"
+import GachaGame from "../contracts/gacha-game.cdc"
+import NonFungibleToken from "../dependencies/flow-nft/contracts/NonFungibleToken.cdc"
+import MetadataViews from "../dependencies/flow-nft/contracts/MetadataViews.cdc"
 
 /// This script gets all the view-based metadata associated with the specified NFT
 /// and returns it as a single struct
@@ -43,7 +45,6 @@ pub struct NFT {
         collectionExternalURL: String,
         collectionSquareImage: String,
         collectionBannerImage: String,
-        collectionSocials: {String: String},
     ) {
         self.name = name
         self.description = description
@@ -66,15 +67,15 @@ pub struct NFT {
     }
 }
 
-pub fun main(address: Address, id: UInt64): NFT {
+pub fun main(address: Address, uuid: UInt64): NFT {
     let account = getAccount(address)
 
-    let collection = account
-        .getCapability(ExampleNFT.CollectionPublicPath)
-        .borrow<&{ExampleNFT.ExampleNFTCollectionPublic}>()
+    let gachaAccount = account
+        .getCapability(GachaGame.AccountPublicPath)
+        .borrow<&{GachaGame.Account}>()
         ?? panic("Could not borrow a reference to the collection")
 
-    let nft = collection.borrowExampleNFT(id: id)!
+    let nft = GachaAvatars.borrowPrototypeAvatar()
 
     // Get the basic display information for this NFT
     let display = MetadataViews.getDisplay(nft)!
@@ -109,7 +110,6 @@ pub fun main(address: Address, id: UInt64): NFT {
         thumbnail: display.thumbnail.uri(),
         owner: owner,
         nftType: nftType.identifier,
-        royalties: royaltyView.getRoyalties(),
         externalURL: externalURL.url,
         serialNumber: serialNumberView.number,
         collectionPublicPath: nftCollectionView.publicPath,
@@ -123,10 +123,5 @@ pub fun main(address: Address, id: UInt64): NFT {
         collectionExternalURL: collectionDisplay.externalURL.url,
         collectionSquareImage: collectionDisplay.squareImage.file.uri(),
         collectionBannerImage: collectionDisplay.bannerImage.file.uri(),
-        collectionSocials: collectionSocials,
-        edition: nftEditionView.infoList[0],
-        traits: traits,
-				medias:medias,
-				license:license
     )
 }

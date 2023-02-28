@@ -1,4 +1,4 @@
-import FungibleToken from "../dependencies/flow-ft/contracts/cadenceFungibleToken.cdc"
+import FungibleToken from "../dependencies/flow-ft/contracts/FungibleToken.cdc"
 import MetadataViews from "../dependencies/flow-ft/contracts/utility/MetadataViews.cdc"
 import FungibleTokenMetadataViews from "../dependencies/flow-ft/contracts/FungibleTokenMetadataViews.cdc"
 

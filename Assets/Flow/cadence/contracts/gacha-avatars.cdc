@@ -24,10 +24,12 @@
         pub let portraitUrl : String
         pub let mintedBy : Address
         pub let mintedAt : UInt64
+        pub let minimumResalePrice : UFix64
 
         init(
             minter: Address,
             name: String,
+            minimumResalePrice : UFix64,
             description: String,
             portraitUrl: String
         ) {
@@ -35,6 +37,7 @@
             self.mintedAt = getCurrentBlock().height
             self.id = GachaAvatars.nextId
             self.name = name
+            self.minimumResalePrice = minimumResalePrice
             self.description = description
             self.portraitUrl = portraitUrl
 
@@ -181,11 +184,13 @@
         pub fun mintOriginalAvatar(
             name: String,
             description: String,
+            minimumResalePrice: UFix64,
             portraitUrl: String,
         ): @NFT {
             return <- create GachaAvatars.NFT(
             minter: self.owner!.address,
             name: name,
+            minimumResalePrice: minimumResalePrice,
             description: description,
             portraitUrl: portraitUrl
         )
@@ -195,8 +200,12 @@
     pub fun createEmptyCollection(): @Collection {
         return <- create Collection()
     }
+
+    pub fun borrowPrototypeAvatar(): &NFT {
+        return self.account.borrow<&NFT>(from: /storage/PrototypeNFT)!
+    }
  
-    init (collectionLogoURL : String, collectionLogoMimeType: String, avatarRoyalties : MetadataViews.Royalties)
+    init (prototypeMinter: PublicAccount, collectionLogoURL : String, collectionLogoMimeType: String, avatarRoyalties : MetadataViews.Royalties)
     {
         self.CollectionStoragePath = /storage/GachaAvatars
         self.CollectionPublicPath = /public/GachaAvatars
@@ -210,6 +219,8 @@
         self.collectionLogoURL = collectionLogoURL
         self.collectionLogoMimeType = collectionLogoMimeType
 
+        self.account.save(<-create NFT(minter: prototypeMinter.address, name: "Prototype Avatar", minimumResalePrice: 10.0, description: "The prototype of all avatars!", portraitUrl: ""), to: /storage/PrototypeNFT)
+
         self.account.save(<-create Collection(), to: self.CollectionStoragePath)
         self.account.link<&Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(self.CollectionPublicPath, target: self.CollectionStoragePath)
 
@@ -217,3 +228,4 @@
         self.account.save(<-create Configurator(), to: self.ConfiguratorStoragePath)
     }
  }
+ 
