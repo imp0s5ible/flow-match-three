@@ -10,127 +10,132 @@
     pub let GameProviderPublicPath : PublicPath
 
     pub resource interface ReadAccount {
-      pub fun get_name() : String
-      pub fun borrow_avatar(uuid: UInt64) : &GachaAvatars.NFT?
-      pub fun is_avatar_valid(uuid: UInt64) : Bool
+      pub fun getName() : String
+      pub fun borrowAvatar(uuid: UInt64) : &GachaAvatars.NFT?
+      pub fun avatarUUIDs() : [UInt64]
+      pub fun isAvatarValid(uuid: UInt64) : Bool
       {
-         return self.borrow_avatar(uuid: uuid) != nil
+         return self.borrowAvatar(uuid: uuid) != nil
       }
     }
 
     pub resource interface CreditAccountAvatars {
-      access(contract) fun add_avatar(avatar : @GachaAvatars.NFT)
+      access(contract) fun addAvatar(avatar : @GachaAvatars.NFT)
     }
 
     pub resource interface BuyAccountAvatars {
-      access(contract) fun buy_avatar_for(uuid: UInt64, payment : @GachaGems.Vault, for_account: Capability<&GachaGame.Account{CreditAccountAvatars}>)
-      pub fun get_avatar_price(uuid: UInt64) : UFix64?
+      access(contract) fun buyAvatarFor(uuid: UInt64, payment : @GachaGems.Vault, forAccount: Capability<&GachaGame.Account{CreditAccountAvatars}>)
+      pub fun getAvatarPrice(uuid: UInt64) : UFix64?
     }
 
     pub resource interface ConfigureAccount {
-      pub fun set_name(new_name : String)
-      pub fun set_avatar(uuid : UInt64)
-      pub fun sell_avatar(uuid : UInt64, sell_price : UFix64)
+      pub fun setName(newName : String)
+      pub fun setAvatar(uuid : UInt64)
+      pub fun sellAvatar(uuid : UInt64, sellPrice : UFix64)
     }
 
     pub resource interface AwardAccount {
-      access(contract) fun award_gems(award : @GachaGems.Vault)
+      access(contract) fun awardGems(award : @GachaGems.Vault)
     }
 
     pub resource Account : ReadAccount, ConfigureAccount, AwardAccount, CreditAccountAvatars, BuyAccountAvatars {
-      pub var name : String
-      pub var authorizedAccount : PublicAccount
-      pub var active_avatar_uuid : UInt64
-      pub var gems : @GachaGems.Vault
-      pub var owned_avatars : @{UInt64: GachaAvatars.NFT}
-      pub var sell_prices : {UInt64: UFix64}
-      pub var sold_avatars : @{UInt64: GachaAvatars.NFT}
+      priv var name : String
+      priv var authorizedAccount : PublicAccount
+      priv var activeAvatarUUID : UInt64
+      priv var gems : @GachaGems.Vault
+      priv var ownedAvatars : @{UInt64: GachaAvatars.NFT}
+      priv var sellPrices : {UInt64: UFix64}
+      priv var soldAvatars : @{UInt64: GachaAvatars.NFT}
 
       init(name : String, authorizedAccount: PublicAccount)
       {
          self.name = name
          self.authorizedAccount = authorizedAccount
-         self.active_avatar_uuid = 0
-         self.sell_prices = {}
+         self.activeAvatarUUID = 0
+         self.sellPrices = {}
          self.gems <- GachaGems.createEmptyVault()
-         self.owned_avatars <- {}
-         self.sold_avatars <- {}
+         self.ownedAvatars <- {}
+         self.soldAvatars <- {}
       }
 
-      pub fun is_owned_by_authorized_account(): Bool {
+      pub fun isOwnedByAuthorizedAccount(): Bool {
          return self.authorizedAccount.address == self.owner!.address
       }
 
-      pub fun get_name() : String {
+      pub fun getName() : String {
          return self.name
       }
 
-      pub fun borrow_avatar(uuid: UInt64) : &GachaAvatars.NFT? {
-         assert(self.is_owned_by_authorized_account())
-         return &self.owned_avatars[uuid] as &GachaAvatars.NFT?
+      pub fun borrowAvatar(uuid: UInt64) : &GachaAvatars.NFT? {
+         assert(self.isOwnedByAuthorizedAccount())
+         return &self.ownedAvatars[uuid] as &GachaAvatars.NFT?
       }
 
-      pub fun set_name(new_name : String) {
-         assert(self.is_owned_by_authorized_account())
-         self.name = new_name
+      pub fun avatarUUIDs() : [UInt64] {
+         return self.ownedAvatars.keys
       }
 
-      pub fun set_avatar(uuid : UInt64)
+      pub fun setName(newName : String) {
+         assert(self.isOwnedByAuthorizedAccount())
+         self.name = newName
+      }
+
+      pub fun setAvatar(uuid : UInt64)
       {
-         assert(self.is_owned_by_authorized_account())
+         assert(self.isOwnedByAuthorizedAccount())
          if (uuid != 0) {
-            assert(self.owned_avatars.containsKey(uuid))
+            assert(self.ownedAvatars.containsKey(uuid))
          }
-         self.active_avatar_uuid = uuid
+         self.activeAvatarUUID = uuid
       }
 
-      pub fun buy_avatar_from(uuid: UInt64, from_account: Capability<&GachaGame.Account{BuyAccountAvatars}>, for_account: Capability<&GachaGame.Account{CreditAccountAvatars}>)
+      pub fun buyAvatarFrom(uuid: UInt64, fromAccount: Capability<&GachaGame.Account{BuyAccountAvatars}>, forAccount: Capability<&GachaGame.Account{CreditAccountAvatars}>)
       {
-         assert(self.is_owned_by_authorized_account())
-         assert(for_account.borrow()!.uuid == self.uuid)
+         assert(self.isOwnedByAuthorizedAccount())
+         assert(forAccount.borrow()!.uuid == self.uuid)
 
-         let payment <- self.gems.withdraw(amount: from_account.borrow()!.get_avatar_price(uuid: uuid)!) as! @GachaGems.Vault
-         from_account.borrow()!.buy_avatar_for(uuid: uuid, payment: <-payment, for_account: for_account)
+         let payment <- self.gems.withdraw(amount: fromAccount.borrow()!.getAvatarPrice(uuid: uuid)!) as! @GachaGems.Vault
+         fromAccount.borrow()!.buyAvatarFor(uuid: uuid, payment: <-payment, forAccount: forAccount)
       }
 
-      access(contract) fun buy_avatar_for(uuid: UInt64, payment : @GachaGems.Vault, for_account: Capability<&GachaGame.Account{CreditAccountAvatars}>) {
-         assert(self.is_owned_by_authorized_account())
-         assert(payment.balance >= self.sell_prices[uuid]!, message: "not enough gems to buy this avatar!")
+      access(contract) fun buyAvatarFor(uuid: UInt64, payment : @GachaGems.Vault, forAccount: Capability<&GachaGame.Account{CreditAccountAvatars}>) {
+         assert(self.isOwnedByAuthorizedAccount())
+         assert(payment.balance >= self.sellPrices[uuid]!, message: "not enough gems to buy this avatar!")
          self.gems.deposit(from: <-payment)
-         var boughtAvatar: @GachaAvatars.NFT <- self.sold_avatars.remove(key: uuid)!
-         for_account.borrow()!.add_avatar(avatar: <-boughtAvatar)
+         var boughtAvatar: @GachaAvatars.NFT <- self.soldAvatars.remove(key: uuid)!
+         forAccount.borrow()!.addAvatar(avatar: <-boughtAvatar)
       }
 
-      pub fun get_avatar_price(uuid: UInt64) : UFix64? {
-         assert(self.is_owned_by_authorized_account())
-         return self.sell_prices[uuid]
+      pub fun getAvatarPrice(uuid: UInt64) : UFix64? {
+         assert(self.isOwnedByAuthorizedAccount())
+         return self.sellPrices[uuid]
       }
 
-      pub fun sell_avatar(uuid : UInt64, sell_price : UFix64) {
-         assert(self.is_owned_by_authorized_account())
-         let avatar_to_sell <- self.owned_avatars.remove(key:uuid)!
-         assert(avatar_to_sell.minimumResalePrice <= sell_price);
-         let sell_uuid = avatar_to_sell.uuid
+      pub fun sellAvatar(uuid : UInt64, sellPrice : UFix64) {
+         assert(self.isOwnedByAuthorizedAccount())
+         let avatarToSell <- self.ownedAvatars.remove(key:uuid)!
+         assert(avatarToSell.minimumResalePrice <= sellPrice);
+         let sellUUID = avatarToSell.uuid
 
-         self.sold_avatars[sell_uuid] <-! avatar_to_sell
+         self.soldAvatars[sellUUID] <-! avatarToSell
       }
 
-      pub fun remove_avatar_from_sale(uuid: UInt64) {
-         assert(self.is_owned_by_authorized_account())
-         self.owned_avatars[uuid] <-! self.sold_avatars.remove(key: uuid)
+      pub fun removeAvatarFromSale(uuid: UInt64) {
+         assert(self.isOwnedByAuthorizedAccount())
+         self.ownedAvatars[uuid] <-! self.soldAvatars.remove(key: uuid)
       }
 
-      access(contract) fun add_avatar(avatar : @GachaAvatars.NFT){
-         assert(self.is_owned_by_authorized_account())
-         self.owned_avatars[avatar.uuid] <-! avatar
+      access(contract) fun addAvatar(avatar : @GachaAvatars.NFT){
+         assert(self.isOwnedByAuthorizedAccount())
+         self.ownedAvatars[avatar.uuid] <-! avatar
       }
 
-      access(contract) fun award_gems(award : @GachaGems.Vault) {
-         assert(self.is_owned_by_authorized_account())
+      access(contract) fun awardGems(award : @GachaGems.Vault) {
+         assert(self.isOwnedByAuthorizedAccount())
          self.gems.deposit(from: <-award)
       }
 
-      pub fun reauthorize_owner() {
+      pub fun reauthorizeOwner() {
          // do penalties for transferring ownership here
          destroy self.gems.withdraw(amount: self.gems.balance / UFix64(2))
 
@@ -138,21 +143,12 @@
       }
 
       destroy () {
-         destroy self.owned_avatars
-         destroy self.sold_avatars
+         destroy self.ownedAvatars
+         destroy self.soldAvatars
          destroy self.gems
       }
     }
 
-
-
-    pub resource GemAward {
-      pub let num_gems : UFix64
-
-      init(num_gems : UFix64) {
-         self.num_gems = num_gems
-      }
-    }
 
     pub resource Map {
       pub let tiles : [Bool]
@@ -212,7 +208,7 @@
       }
 
       pub fun claimRewardsForScore(player : &Account{AwardAccount}, score: UInt32) {
-         player.award_gems(award: <-self.gemsMinter.borrow()!.mintTokens(amount: UFix64(score)))
+         player.awardGems(award: <-self.gemsMinter.borrow()!.mintTokens(amount: UFix64(score)))
       }
 
       destroy() {
@@ -220,7 +216,7 @@
       }
     }
 
-    pub fun createNewAccount(name : String, authorizedOwner: PublicAccount, starting_avatar : Capability<&GachaAvatars.NFT>?) : @Account {
+    pub fun createNewAccount(name : String, authorizedOwner: PublicAccount, startingAvatar : Capability<&GachaAvatars.NFT>?) : @Account {
       return <-create Account(name: name, authorizedAccount: authorizedOwner)
     }
 
